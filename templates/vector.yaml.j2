@@ -1,0 +1,16 @@
+data_dir: "/var/lib/vector"
+
+api:
+  enabled: true
+  address: "127.0.0.1:8686"
+
+sources:
+  incoming_logs:
+    type: "stdin"
+
+sinks:
+  out:
+    type: "console"
+    inputs: ["incoming_logs"]
+    encoding:
+      codec: "json"

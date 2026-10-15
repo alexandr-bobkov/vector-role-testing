@@ -1,0 +1,54 @@
+---
+- name: Ensure Vector configuration directory exists
+  ansible.builtin.file:
+    path: /etc/vector
+    state: directory
+    mode: "0755"
+
+- name: Ensure Vector data directory exists
+  ansible.builtin.file:
+    path: /var/lib/vector
+    state: directory
+    mode: "0755"
+
+# ==========================================
+# 1. УСТАНОВКА ДЛЯ DEBIAN / UBUNTU
+# ==========================================
+- name: Download Vector DEB package (Debian/Ubuntu)
+  ansible.builtin.get_url:
+    url: "https://github.com/vectordotdev/vector/releases/download/v0.35.0/vector_0.35.0-1_amd64.deb"
+    dest: "/tmp/vector.deb"
+    mode: "0644"
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Install Vector from local DEB (Debian/Ubuntu)
+  ansible.builtin.apt:
+    deb: "/tmp/vector.deb"
+    state: present
+  when: ansible_facts['os_family'] == "Debian"
+
+# ==========================================
+# 2. УСТАНОВКА ДЛЯ REDHAT / ORACLE LINUX
+# ==========================================
+- name: Download Vector RPM package (RedHat)
+  ansible.builtin.get_url:
+    url: "https://github.com/vectordotdev/vector/releases/download/v0.35.0/vector-0.35.0-1.x86_64.rpm"
+    dest: "/tmp/vector.rpm"
+    mode: "0644"
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Install Vector from local RPM (RedHat)
+  ansible.builtin.dnf:
+    name: "/tmp/vector.rpm"
+    state: present
+    disable_gpg_check: true
+  when: ansible_facts['os_family'] == "RedHat"
+
+# ==========================================
+# 3. КОНФИГУРАЦИЯ
+# ==========================================
+- name: Template Vector configuration file
+  ansible.builtin.template:
+    src: vector.toml.j2
+    dest: /etc/vector/vector.toml
+    mode: "0644"

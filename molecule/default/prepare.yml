@@ -1,0 +1,16 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Bootstrap python and dependencies for Ansible
+      ansible.builtin.raw: |
+        if command -v apt-get >/dev/null; then
+          apt-get update && apt-get install -y python3 sudo gnupg apt-transport-https ca-certificates
+        elif command -v dnf >/dev/null; then
+          dnf install -y python39 sudo
+          alternatives --set python3 /usr/bin/python3.9 || true
+        elif command -v yum >/dev/null; then
+          yum install -y python3 sudo
+        fi
+      changed_when: false
