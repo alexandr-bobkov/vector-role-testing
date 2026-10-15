@@ -1,38 +1,86 @@
-Role Name
-=========
+<details>
+<summary><b>Задание</b></summary>
+Домашнее задание к занятию 5 «Тестирование roles»
+Подготовка к выполнению
 
-A brief description of the role goes here.
+    Установите molecule и его драйвера: pip3 install "molecule molecule_docker molecule_podman.
+    Выполните docker pull aragast/netology:latest — это образ с podman, tox и несколькими пайтонами (3.7 и 3.9) внутри.
 
-Requirements
-------------
+Основная часть
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Ваша цель — настроить тестирование ваших ролей.
 
-Role Variables
---------------
+Задача — сделать сценарии тестирования для vector.
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Ожидаемый результат — все сценарии успешно проходят тестирование ролей.
+Molecule
 
-Dependencies
-------------
+    Запустите molecule test -s ubuntu_xenial (или с любым другим сценарием, не имеет значения) внутри корневой директории clickhouse-role, посмотрите на вывод команды. Данная команда может отработать с ошибками или не отработать вовсе, это нормально. Наша цель - посмотреть как другие в реальном мире используют молекулу И из чего может состоять сценарий тестирования.
+    Перейдите в каталог с ролью vector-role и создайте сценарий тестирования по умолчанию при помощи molecule init scenario --driver-name docker.
+    Добавьте несколько разных дистрибутивов (oraclelinux:8, ubuntu:latest) для инстансов и протестируйте роль, исправьте найденные ошибки, если они есть.
+    Добавьте несколько assert в verify.yml-файл для проверки работоспособности vector-role (проверка, что конфиг валидный, проверка успешности запуска и др.).
+    Запустите тестирование роли повторно и проверьте, что оно прошло успешно.
+    Добавьте новый тег на коммит с рабочим сценарием в соответствии с семантическим версионированием.
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Tox
 
-Example Playbook
-----------------
+    Добавьте в директорию с vector-role файлы из директории.
+    Запустите docker run --privileged=True -v <path_to_repo>:/opt/vector-role -w /opt/vector-role -it aragast/netology:latest /bin/bash, где path_to_repo — путь до корня репозитория с vector-role на вашей файловой системе.
+    Внутри контейнера выполните команду tox, посмотрите на вывод.
+    Создайте облегчённый сценарий для molecule с драйвером molecule_podman. Проверьте его на исполнимость.
+    Пропишите правильную команду в tox.ini, чтобы запускался облегчённый сценарий.
+    Запустите команду tox. Убедитесь, что всё отработало успешно.
+    Добавьте новый тег на коммит с рабочим сценарием в соответствии с семантическим версионированием.
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+После выполнения у вас должно получится два сценария molecule и один tox.ini файл в репозитории. Не забудьте указать в ответе теги решений Tox и Molecule заданий. В качестве решения пришлите ссылку на ваш репозиторий и скриншоты этапов выполнения задания.
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
 
-License
--------
+</details>
 
-BSD
+-----
+-----
 
-Author Information
-------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+<details>
+<summary><b>Ответ</b></summary>
+
+
+## Поддерживаемые ОС
+Роль протестирована и поддерживает следующие операционные системы:
+- **Ubuntu / Debian** (установка через локальный `.deb` пакет)
+- **Oracle Linux 8 / RedHat** (установка через локальный `.rpm` пакет)
+
+## Описание работы
+Роль выполняет следующие задачи:
+1. Создает необходимые директории для конфигурации (`/etc/vector`) и данных (`/var/lib/vector`).
+2. Скачивает дистрибутив Vector (версия `0.35.0`) напрямую с официального репозитория GitHub.
+3. Устанавливает пакеты без необходимости добавления внешних apt/yum репозиториев (защита от сбоев кэша).
+4. Генерирует базовый конфигурационный файл `vector.toml` из Jinja2-шаблона.
+
+## Требования для запуска и тестирования
+- **Ansible**: `2.15.*`
+- **Docker** (для сценария `default`)
+- **Podman** (для сценария `podman`)
+- **Molecule**: `6.0.3`
+- **Tox**: `3.25+`
+
+- Сценарий Default (Docker)
+Проверяет кросс-платформенную установку на ubuntu:latest и oraclelinux:8
+> 📸 ** Выполнение molecule test:** 📸
+> ![Скриншот](./img/1.png)
+
+
+- Сценарий Podman (Tox)
+Облегченный сценарий тестирования в изолированном окружении Podman (через crun) для Ubuntu с использованием Tox.
+> 📸 ** Выполнение Tox:** 📸
+> ![Скриншот](./img/2.png)
+
+- Для удобства две части задания разнесены по тегам
+> 📸 ** Теги в github:** 📸
+> ![Скриншот](./img/3.png)
+
+
+</details>
+
+-----
+-----
