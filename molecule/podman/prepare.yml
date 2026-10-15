@@ -1,0 +1,12 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.raw: apt-get update
+      changed_when: false
+
+    - name: Install python and dependencies
+      ansible.builtin.raw: apt-get install -y python3 sudo gnupg apt-transport-https ca-certificates
+      changed_when: false
